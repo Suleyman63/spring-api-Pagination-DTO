@@ -4,6 +4,10 @@ package com.example.demo.controller;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
+import com.example.demo.util.CustomPage;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,6 +58,33 @@ public class UserContoller {
     public ResponseEntity<UserDTO> editUser(@PathVariable("id") Long id, @RequestBody UserDTO user){
         UserDTO result = userService.editUser(id,user);
         return ResponseEntity.ok(result);
+
+    }
+
+
+    @GetMapping("/pagination")
+    public ResponseEntity<Page<User>> pagination(int currentPage, int pageSize){
+        return ResponseEntity.ok(userService.pagination(currentPage,pageSize));
+
+    }
+
+    @GetMapping("/pagination/v1")
+    public ResponseEntity<Page<User>> pagination(Pageable pageable){
+        return ResponseEntity.ok(userService.pagination(pageable));
+
+    }
+
+
+    @GetMapping("/pagination/v2")
+    public ResponseEntity<Slice<User>> slice(Pageable pageable){
+        return ResponseEntity.ok(userService.slice(pageable));
+
+    }
+
+
+    @GetMapping("/pagination/v3")
+    public ResponseEntity<CustomPage<UserDTO>> customPagination(Pageable pageable){
+        return ResponseEntity.ok(userService.customPagination(pageable));
 
     }
 }

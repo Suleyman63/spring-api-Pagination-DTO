@@ -4,10 +4,17 @@ import com.example.demo.dto.UserDTO;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
+import com.example.demo.util.CustomPage;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -45,9 +52,8 @@ public class UserServiceImp implements UserService {
        if (user.isPresent()){
            return modelMapper.map(user.get(), UserDTO.class);
        }
-        return null;
+        throw new RuntimeException("user not found");
     }
-
 
     @Override
     public Boolean deleteUser(Long id) {
@@ -57,7 +63,7 @@ public class UserServiceImp implements UserService {
              userRepository.findById(id);
              return true;
         }
-        return null;
+        throw new RuntimeException("user not deleted");
     }
 
 
@@ -77,5 +83,32 @@ public class UserServiceImp implements UserService {
         return null;
     }
 
+
+    @Override
+    public Page<User> pagination(int currentPage, int pageSize) {
+        Pageable pageable = PageRequest.of(currentPage,pageSize);
+
+        return userRepository.findAll(pageable);
+    }
+
+
+    @Override
+    public Page<User> pagination(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+
+    @Override
+    public Slice<User> slice(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    @Override
+    public CustomPage<UserDTO> customPagination(Pageable pageable) {
+       Page<User> data = userRepository.findAll(pageable);
+       UserDTO[] dtos = modelMapper.map(data.getContent(), UserDTO[].class);
+
+        return new CustomPage<>(data, Arrays.asList(dtos));
+    }
 
 }
